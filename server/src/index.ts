@@ -1,9 +1,8 @@
-import dotenv from "dotenv";
-import { fileURLToPath } from "url";
-import path from "path";
+import "./env.js";
+import app from "./app.js";
+import pool from "./db/index.js";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-dotenv.config({ path: path.resolve(__dirname, "../../.env") });
+const PORT = Number(process.env["PORT"] ?? 3001);
 
 console.log("[startup] ENV check:", {
   DB_HOST: process.env["DB_HOST"] ?? "NOT SET",
@@ -12,13 +11,8 @@ console.log("[startup] ENV check:", {
   DB_PASSWORD: process.env["DB_PASSWORD"] ? "***SET***" : "NOT SET",
   DB_NAME: process.env["DB_NAME"] ?? "NOT SET",
   JWT_SECRET: process.env["JWT_SECRET"] ? "***SET***" : "NOT SET",
-  PORT: process.env["PORT"] ?? "NOT SET",
+  PORT,
 });
-
-const { default: app } = await import("./app.js");
-const { default: pool } = await import("./db/index.js");
-
-const PORT = Number(process.env["PORT"] ?? 3001);
 
 async function start() {
   console.log("[startup] Connecting to database...");
