@@ -20,7 +20,7 @@ router.get("/:id", async (req, res) => {
 // GET /api/users/:id/listings - get user's listings
 router.get("/:id/listings", async (req, res) => {
   const [rows] = await pool.query<RowDataPacket[]>(
-    "SELECT * FROM listings WHERE user_id = ? ORDER BY created_at DESC",
+    "SELECT id, user_id, title, description, price, category, condition_type, status, image_url, created_at, updated_at FROM listings WHERE user_id = ? ORDER BY created_at DESC",
     [req.params["id"]]
   );
   res.json(rows);

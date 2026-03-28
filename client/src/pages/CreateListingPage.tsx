@@ -38,25 +38,29 @@ export default function CreateListingPage() {
       setError("Title and price are required.");
       return;
     }
+    if (!imageFile) {
+      setError("An image is required.");
+      return;
+    }
 
     setUploading(true);
     try {
-      let image_url: string | null = null;
-
-      // Upload image first if selected
-      if (imageFile) {
-        const formData = new FormData();
-        formData.append("image", imageFile);
-        const uploadRes = await http().post<{ url: string }>("/api/upload", formData);
-        image_url = uploadRes.data.url;
-      }
-
+      // Create listing first
       const res = await http().post<{ id: number }>("/api/listings", {
         ...form,
         price: parseFloat(form.price),
         user_id: 1, // TODO: replace with auth
-        image_url,
+        image_url: null,
       });
+
+      // Upload image to the listing if selected
+      if (imageFile) {
+        const formData = new FormData();
+        formData.append("image", imageFile);
+        formData.append("listing_id", res.data.id.toString());
+        await http().post("/api/upload", formData);
+      }
+
       navigate(`/listings/${res.data.id}`);
     } catch {
       setError("Failed to create listing. Please try again.");
@@ -81,7 +85,7 @@ export default function CreateListingPage() {
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Image Upload */}
           <div>
-            <label className="block text-sm font-medium mb-2">Photo</label>
+            <label className="block text-sm font-medium mb-2">Photo *</label>
             <Card
               className="border-dashed border-2 border-border rounded-xl overflow-hidden cursor-pointer hover:border-foreground/40 transition"
               onClick={() => document.getElementById("image-input")?.click()}

@@ -7,7 +7,7 @@ const router = Router();
 // GET /api/listings - get all active listings
 router.get("/", async (_req, res) => {
   const [rows] = await pool.query<RowDataPacket[]>(
-    `SELECT l.*, u.username
+    `SELECT l.id, l.user_id, l.title, l.description, l.price, l.category, l.condition_type, l.status, l.image_url, l.created_at, l.updated_at, u.username
      FROM listings l
      JOIN users u ON l.user_id = u.id
      WHERE l.status = 'active'
@@ -19,7 +19,7 @@ router.get("/", async (_req, res) => {
 // GET /api/listings/search?q=&category=&minPrice=&maxPrice=
 router.get("/search", async (req, res) => {
   const { q, category, minPrice, maxPrice } = req.query;
-  let sql = `SELECT l.*, u.username FROM listings l JOIN users u ON l.user_id = u.id WHERE l.status = 'active'`;
+  let sql = `SELECT l.id, l.user_id, l.title, l.description, l.price, l.category, l.condition_type, l.status, l.image_url, l.created_at, l.updated_at, u.username FROM listings l JOIN users u ON l.user_id = u.id WHERE l.status = 'active'`;
   const params: (string | number)[] = [];
 
   if (q) {
@@ -47,7 +47,7 @@ router.get("/search", async (req, res) => {
 // GET /api/listings/:id - get single listing
 router.get("/:id", async (req, res) => {
   const [rows] = await pool.query<RowDataPacket[]>(
-    `SELECT l.*, u.username
+    `SELECT l.id, l.user_id, l.title, l.description, l.price, l.category, l.condition_type, l.status, l.image_url, l.created_at, l.updated_at, u.username
      FROM listings l
      JOIN users u ON l.user_id = u.id
      WHERE l.id = ?`,

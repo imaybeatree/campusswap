@@ -18,7 +18,6 @@ app.use(express.json());
 
 // Static files
 app.use(express.static(path.join(ROOT, "client/dist")));
-app.use("/uploads", express.static(path.join(ROOT, "server/uploads")));
 
 // API routes
 app.get("/api/health", (_req, res) => {
@@ -29,6 +28,7 @@ app.post("/api/auth/register", registerHandler);
 app.post("/api/auth/login", loginHandler);
 
 app.use("/api/upload", uploadRouter);
+app.use("/api", uploadRouter);
 app.use("/api/listings", listingsRouter);
 app.use("/api/users", usersRouter);
 app.use("/api/messages", messagesRouter);
