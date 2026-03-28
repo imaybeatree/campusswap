@@ -1,14 +1,32 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { http } from "@/lib/http";
+import { AxiosError } from "axios";
+import { setToken } from "@/lib/token";
 
 export default function LoginPage() {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
-  const handleSubmit = (e: React.SubmitEvent) => {
+  const handleSubmit = async (e: React.SubmitEvent) => {
     e.preventDefault();
-    // TODO: implement auth
-    console.log("Login:", { email, password });
+    setError("");
+    try {
+      const res = await http().post<{ token: string }>("/api/auth/login", {
+        email,
+        password,
+      });
+      setToken(res.data.token)
+      navigate("/home");
+    } catch (err) {
+      if (err instanceof AxiosError && err.response?.status === 401) {
+        setError("Invalid email or password.");
+      } else {
+        setError("Something went wrong. Please try again.");
+      }
+    }
   };
 
   return (
@@ -18,6 +36,8 @@ export default function LoginPage() {
           <Link to="/" className="text-3xl font-bold text-black">CampusSwap</Link>
           <p className="mt-2 text-gray-500">Sign in to your account</p>
         </div>
+
+        {error && <div className="mb-4 p-3 bg-red-50 text-red-700 rounded-lg text-sm">{error}</div>}
 
         <form onSubmit={handleSubmit} className="bg-white p-8 rounded-xl border border-gray-200 space-y-4">
           <div>

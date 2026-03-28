@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
-import axios from "axios";
-
-const API = "http://localhost:3001/api";
+import { http, imageUrl } from "@/lib/http";
 
 interface ListingDetail {
   id: number;
@@ -24,7 +22,7 @@ export default function ListingDetailPage() {
   const [message, setMessage] = useState("");
 
   useEffect(() => {
-    axios.get<ListingDetail>(`${API}/listings/${id}`).then((res) => setListing(res.data)).catch(console.error);
+    http().get<ListingDetail>(`/api/listings/${id}`).then((res) => setListing(res.data)).catch(console.error);
   }, [id]);
 
   if (!listing) {
@@ -35,7 +33,7 @@ export default function ListingDetailPage() {
     <div className="min-h-screen bg-gray-50">
       <nav className="bg-white border-b border-gray-200 px-4 py-4">
         <div className="max-w-6xl mx-auto">
-          <Link to="/" className="text-indigo-600 hover:text-indigo-700 font-semibold">&larr; Back to listings</Link>
+          <Link to="/home" className="text-black font-semibold">&larr; Back to listings</Link>
         </div>
       </nav>
 
@@ -44,7 +42,7 @@ export default function ListingDetailPage() {
           {/* Image */}
           <div className="aspect-square bg-gray-200 rounded-xl flex items-center justify-center overflow-hidden">
             {listing.image_url ? (
-              <img src={listing.image_url} alt={listing.title} className="w-full h-full object-cover" />
+              <img src={imageUrl(listing.image_url)!} alt={listing.title} className="w-full h-full object-cover" />
             ) : (
               <span className="text-gray-400 text-6xl">📦</span>
             )}
@@ -53,11 +51,11 @@ export default function ListingDetailPage() {
           {/* Details */}
           <div>
             <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
-              <span className="px-2 py-1 bg-indigo-100 text-indigo-700 rounded-full capitalize">{listing.category}</span>
+              <span className="px-2 py-1 bg-indigo-100 text-black rounded-full capitalize">{listing.category}</span>
               <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded-full capitalize">{listing.condition_type.replace("_", " ")}</span>
             </div>
             <h1 className="text-3xl font-bold text-gray-900">{listing.title}</h1>
-            <p className="text-3xl font-bold text-indigo-600 mt-2">${listing.price.toFixed(2)}</p>
+            <p className="text-3xl font-bold text-black mt-2">${Number(listing.price).toFixed(2)}</p>
 
             <div className="mt-6 flex items-center gap-3 p-4 bg-white rounded-lg border border-gray-200">
               <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 font-bold">
@@ -87,7 +85,7 @@ export default function ListingDetailPage() {
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-300 resize-none"
                 rows={3}
               />
-              <button className="mt-3 w-full py-2 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition">
+              <button className="mt-3 w-full py-2 bg-black text-white font-semibold cursor-pointer rounded-lg hover:bg-gray-600 transition">
                 Send Message
               </button>
             </div>

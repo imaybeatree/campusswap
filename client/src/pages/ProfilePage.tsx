@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
-import axios from "axios";
-
-const API = "http://localhost:3001/api";
+import { http, imageUrl } from "@/lib/http";
 
 interface User {
   id: number;
@@ -28,8 +26,8 @@ export default function ProfilePage() {
   const [listings, setListings] = useState<Listing[]>([]);
 
   useEffect(() => {
-    axios.get<User>(`${API}/users/${id}`).then((res) => setUser(res.data)).catch(console.error);
-    axios.get<Listing[]>(`${API}/users/${id}/listings`).then((res) => setListings(res.data)).catch(console.error);
+    http().get<User>(`/api/users/${id}`).then((res) => setUser(res.data)).catch(console.error);
+    http().get<Listing[]>(`/api/users/${id}/listings`).then((res) => setListings(res.data)).catch(console.error);
   }, [id]);
 
   if (!user) {
@@ -66,14 +64,14 @@ export default function ProfilePage() {
               <Link key={listing.id} to={`/listings/${listing.id}`} className="bg-white rounded-xl shadow-sm hover:shadow-md transition overflow-hidden border border-gray-100">
                 <div className="aspect-square bg-gray-200 flex items-center justify-center">
                   {listing.image_url ? (
-                    <img src={listing.image_url} alt={listing.title} className="w-full h-full object-cover" />
+                    <img src={imageUrl(listing.image_url)!} alt={listing.title} className="w-full h-full object-cover" />
                   ) : (
                     <span className="text-gray-400 text-4xl">📦</span>
                   )}
                 </div>
                 <div className="p-4">
                   <h3 className="font-semibold text-gray-900 truncate">{listing.title}</h3>
-                  <p className="text-lg font-bold text-indigo-600 mt-1">${listing.price.toFixed(2)}</p>
+                  <p className="text-lg font-bold text-indigo-600 mt-1">${Number(listing.price).toFixed(2)}</p>
                   <span className={`inline-block mt-2 px-2 py-1 text-xs rounded-full ${listing.status === "active" ? "bg-green-100 text-green-700" : listing.status === "sold" ? "bg-red-100 text-red-700" : "bg-gray-100 text-gray-700"}`}>
                     {listing.status.charAt(0).toUpperCase() + listing.status.slice(1)}
                   </span>

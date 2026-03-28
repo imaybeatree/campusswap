@@ -1,14 +1,31 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { AxiosError } from "axios";
+import { http } from "@/lib/http";
+import { setToken } from "@/lib/token";
 
 export default function RegisterPage() {
+  const navigate = useNavigate();
   const [form, setForm] = useState({ email: "", username: "", password: "" });
+  const [error, setError] = useState("");
   const update = (field: string, value: string) => setForm((prev) => ({ ...prev, [field]: value }));
 
-  const handleSubmit = (e: React.SubmitEvent) => {
+  const handleSubmit = async (e: React.SubmitEvent) => {
     e.preventDefault();
-    // TODO: implement auth
-    console.log("Register:", form);
+    setError("");
+    try {
+      const res = await http().post<{ token: string }>("/api/auth/register", form);
+      setToken(res.data.token)
+      navigate("/home");
+    } catch (err) {
+      if (err instanceof AxiosError && err.response?.status === 409) {
+        setError("Email already in use.");
+      } else if (err instanceof AxiosError && err.response?.status === 400) {
+        setError("Please check your inputs. Password must be at least 8 characters.");
+      } else {
+        setError("Something went wrong. Please try again.");
+      }
+    }
   };
 
   return (
@@ -18,6 +35,8 @@ export default function RegisterPage() {
           <Link to="/" className="text-3xl font-bold text-black">CampusSwap</Link>
           <p className="mt-2 text-gray-500">Create your account</p>
         </div>
+
+        {error && <div className="mb-4 p-3 bg-red-50 text-red-700 rounded-lg text-sm">{error}</div>}
 
         <form onSubmit={handleSubmit} className="bg-white p-8 rounded-xl border border-gray-200 space-y-4">
           <div>
