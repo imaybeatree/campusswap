@@ -21,6 +21,17 @@ export const getUserByEmail = async (
   return rows[0] as UserRow;
 };
 
+export const getUserByUsername = async (
+  username: string,
+): Promise<UserRow | null> => {
+  const [rows] = await pool.query<RowDataPacket[]>(
+    "SELECT * FROM users WHERE username = ?",
+    [username],
+  );
+  if (rows.length === 0) return null;
+  return rows[0] as UserRow;
+};
+
 export const insertUser = async (params: {
   email: string;
   username: string;

@@ -6,22 +6,47 @@ import { setToken } from "@/lib/token";
 
 export default function RegisterPage() {
   const navigate = useNavigate();
-  const [form, setForm] = useState({ email: "", username: "", password: "" });
+  const [form, setForm] = useState({ email: "", username: "", password: "", confirmPassword: "" });
   const [error, setError] = useState("");
   const update = (field: string, value: string) => setForm((prev) => ({ ...prev, [field]: value }));
 
   const handleSubmit = async (e: React.SubmitEvent) => {
     e.preventDefault();
     setError("");
+
+    if (!form.email.endsWith("@lehigh.edu")) {
+      setError("Only @lehigh.edu emails are allowed.");
+      return;
+    }
+
+    if (form.password !== form.confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
+
+    if (form.password.length < 8) {
+      setError("Password must be at least 8 characters.");
+      return;
+    }
+
     try {
-      const res = await http().post<{ token: string }>("/api/auth/register", form);
-      setToken(res.data.token)
+      const res = await http().post<{ token: string }>("/api/auth/register", {
+        email: form.email,
+        username: form.username,
+        password: form.password,
+      });
+      setToken(res.data.token);
       navigate("/home");
     } catch (err) {
       if (err instanceof AxiosError && err.response?.status === 409) {
-        setError("Email already in use.");
+        const msg = err.response.data?.error;
+        if (msg === "username_taken") {
+          setError("Username is already taken.");
+        } else {
+          setError("Email is already in use.");
+        }
       } else if (err instanceof AxiosError && err.response?.status === 400) {
-        setError("Please check your inputs. Password must be at least 8 characters.");
+        setError("Please check your inputs.");
       } else {
         setError("Something went wrong. Please try again.");
       }
@@ -45,6 +70,7 @@ export default function RegisterPage() {
               type="email"
               value={form.email}
               onChange={(e) => update("email", e.target.value)}
+              placeholder="you@lehigh.edu"
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300"
               required
             />
@@ -65,6 +91,16 @@ export default function RegisterPage() {
               type="password"
               value={form.password}
               onChange={(e) => update("password", e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300"
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
+            <input
+              type="password"
+              value={form.confirmPassword}
+              onChange={(e) => update("confirmPassword", e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300"
               required
             />

@@ -1,7 +1,7 @@
 import type { RequestHandler } from "express";
 import { issueJwt } from "./jwt.js";
 import { hashPassword, verifyPassword } from "./password.js";
-import { insertUser, getUserByEmail } from "./user.entity.js";
+import { insertUser, getUserByEmail, getUserByUsername } from "./user.entity.js";
 import {
   authTokenResponseSchema,
   loginRequestSchema,
@@ -13,9 +13,15 @@ export const registerHandler: RequestHandler = async (req, res) => {
   try {
     const { email, username, password } = registerRequestSchema.parse(req.body);
 
-    const existing = await getUserByEmail(email);
-    if (existing) {
-      res.status(409).json({ error: "Email already in use" });
+    const existingEmail = await getUserByEmail(email);
+    if (existingEmail) {
+      res.status(409).json({ error: "email_taken" });
+      return;
+    }
+
+    const existingUsername = await getUserByUsername(username);
+    if (existingUsername) {
+      res.status(409).json({ error: "username_taken" });
       return;
     }
 
