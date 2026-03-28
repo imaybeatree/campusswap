@@ -1,9 +1,18 @@
 import { Link, useNavigate } from "react-router-dom";
 import { Button, buttonVariants } from "@/components/ui/button";
 import logo from "@/assets/campusswap_logo.png";
+import { useEffect } from "react"
+import { isTokenValid } from "@/lib/token";
 
 export default function LandingPage() {
+
   const navigate = useNavigate();
+    useEffect(() => {
+    if (isTokenValid()){
+      navigate("/home")
+    }
+  })
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}

@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { RouteGuard } from "./lib/routeguard";
 import LandingPage from "./pages/LandingPage";
 import HomePage from "./pages/HomePage";
 import ListingDetailPage from "./pages/ListingDetailPage";
@@ -12,14 +13,19 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
+        {/* Public */}
         <Route path="/" element={<LandingPage />} />
-        <Route path="/home" element={<HomePage />} />
-        <Route path="/listings/new" element={<CreateListingPage />} />
-        <Route path="/listings/:id" element={<ListingDetailPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
-        <Route path="/my-listings" element={<MyListingsPage />} />
-        <Route path="/profile/:id" element={<ProfilePage />} />
+
+        {/* Protected */}
+        <Route element={<RouteGuard />}>
+          <Route path="/home" element={<HomePage />} />
+          <Route path="/listings/new" element={<CreateListingPage />} />
+          <Route path="/listings/:id" element={<ListingDetailPage />} />
+          <Route path="/my-listings" element={<MyListingsPage />} />
+          <Route path="/profile/:id" element={<ProfilePage />} />
+        </Route>
       </Routes>
     </BrowserRouter>
   );
