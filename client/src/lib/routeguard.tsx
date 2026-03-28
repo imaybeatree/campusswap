@@ -1,15 +1,13 @@
-import { useMemo } from "react";
-import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { isTokenValid } from "./token";
+import { useMemo } from "react";
+import { Navigate, Outlet } from "react-router-dom";
 
-export function RouteGuard() {
-  const location = useLocation();
-  const valid = useMemo(() => isTokenValid(), []);
-
-  if (valid) {
+export const RouteGuard = () => {
+  // prevent unnecessary re-renders
+  if (useMemo(() => isTokenValid(), [])) {
     return <Outlet />;
+  } else {
+    const path = window.location.pathname + window.location.search;
+    return <Navigate to={`/login?after=${encodeURIComponent(path)}`} />;
   }
-
-  const redirect = encodeURIComponent(location.pathname + location.search);
-  return <Navigate to={`/login?after=${redirect}`} replace />;
-}
+};

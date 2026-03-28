@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { AxiosError } from "axios";
 import { http } from "@/lib/http";
 import { setToken } from "@/lib/token";
 
 export default function RegisterPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [form, setForm] = useState({ email: "", username: "", password: "", confirmPassword: "" });
   const [error, setError] = useState("");
   const update = (field: string, value: string) => setForm((prev) => ({ ...prev, [field]: value }));
@@ -36,7 +37,8 @@ export default function RegisterPage() {
         password: form.password,
       });
       setToken(res.data.token);
-      navigate("/home");
+      const after = searchParams.get("after");
+      navigate(after ? decodeURIComponent(after) : "/home");
     } catch (err) {
       if (err instanceof AxiosError && err.response?.status === 409) {
         const msg = err.response.data?.error;

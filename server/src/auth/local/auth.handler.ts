@@ -43,7 +43,6 @@ export const registerHandler: RequestHandler = async (req, res) => {
 export const loginHandler: RequestHandler = async (req, res) => {
   try {
     const { email, password } = loginRequestSchema.parse(req.body);
-    console.log(`${email}, ${password}`)
 
     const user = await getUserByEmail(email);
     if (!user) {

@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { http } from "@/lib/http";
 import { AxiosError } from "axios";
 import { setToken } from "@/lib/token";
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -18,8 +19,10 @@ export default function LoginPage() {
         email,
         password,
       });
-      setToken(res.data.token)
-      navigate("/home");
+      setToken(res.data.token);
+      const after = searchParams.get("after");
+      console.log(after)
+      navigate(after ? decodeURIComponent(after) : "/home");
     } catch (err) {
       if (err instanceof AxiosError && err.response?.status === 401) {
         setError("Invalid email or password.");
