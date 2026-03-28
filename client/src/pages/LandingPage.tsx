@@ -11,7 +11,7 @@ export default function LandingPage() {
     if (isTokenValid()){
       navigate("/home")
     }
-  })
+  }, [navigate])
 
   return (
     <div className="min-h-screen bg-background">

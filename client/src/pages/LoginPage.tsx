@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { http } from "@/lib/http";
 import { AxiosError } from "axios";
-import { setToken } from "@/lib/token";
+import { isTokenValid, setToken } from "@/lib/token";
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -10,6 +10,12 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    if(isTokenValid()){
+      navigate("/home")
+    }
+  }, [navigate])
 
   const handleSubmit = async (e: React.SubmitEvent) => {
     e.preventDefault();
