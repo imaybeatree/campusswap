@@ -34,7 +34,7 @@ app.use("/api/users", usersRouter);
 app.use("/api/messages", messagesRouter);
 
 // SPA fallback — after API routes
-app.get("*", (_req, res) => {
+app.get("{*path}", (_req, res) => {
   res.sendFile(path.join(ROOT, "client/dist/index.html"));
 });
 
