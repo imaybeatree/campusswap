@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "build": "tsc",
     "dev": "tsx watch src/index.ts",
     "db:up": "dbmate --env-file .dbmate.env -d db/migrations up",
     "db:down": "dbmate --env-file .dbmate.env -d db/migrations down",
