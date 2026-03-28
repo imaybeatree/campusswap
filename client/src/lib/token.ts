@@ -18,13 +18,6 @@ export const isTokenValid = () => {
   try {
     const payload = JSON.parse(atob(token.split(".")[1]));
     const expiration = payload.exp * 1000; // convert to milliseconds
-    console.log(
-      "Token expiration:",
-      new Date(expiration).toLocaleString(),
-      "Time left:",
-      ((expiration - Date.now()) / 1000 / 60).toFixed(0),
-      "minutes",
-    );
     if (expiration < Date.now()) {
       // Token is expired
       throw new Error();

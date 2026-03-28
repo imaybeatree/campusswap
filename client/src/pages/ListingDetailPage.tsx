@@ -19,14 +19,32 @@ interface ListingDetail {
 export default function ListingDetailPage() {
   const { id } = useParams();
   const [listing, setListing] = useState<ListingDetail | null>(null);
+  const [notFound, setNotFound] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
 
   useEffect(() => {
-    http().get<ListingDetail>(`/api/listings/${id}`).then((res) => setListing(res.data)).catch(console.error);
+    http()
+      .get<ListingDetail>(`/api/listings/${id}`)
+      .then((res) => setListing(res.data))
+      .catch(() => setNotFound(true))
+      .finally(() => setLoading(false));
   }, [id]);
 
-  if (!listing) {
+  if (loading) {
     return <div className="min-h-screen flex items-center justify-center text-gray-500">Loading...</div>;
+  }
+
+  if (notFound || !listing) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center text-center px-4">
+        <h1 className="text-4xl font-bold mb-2">Listing not found</h1>
+        <p className="text-muted-foreground mb-6">This listing may have been removed or doesn't exist.</p>
+        <Link to="/home" className="text-sm font-medium hover:underline">
+          &larr; Back to listings
+        </Link>
+      </div>
+    );
   }
 
   return (
