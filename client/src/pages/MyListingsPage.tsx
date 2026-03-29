@@ -5,6 +5,8 @@ import { getToken, signOut } from "@/lib/token";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import logo from "@/assets/campusswap_logo.png";
 
 interface Listing {
@@ -64,21 +66,33 @@ export default function MyListingsPage() {
               className="bg-white text-black cursor-pointer"
               onClick={() => navigate("/home")}
             >
-              Browse listings
+              Browse Listings
             </Button>
-            <Button
-              className="bg-white text-black cursor-pointer"
-              onClick={() => navigate("/listings/new")}
-            >
-              Sell Item
-            </Button>
-            <Button
-              variant="ghost"
-              className="text-white cursor-pointer hover:text-black"
-              onClick={handleSignOut}
-            >
-              Sign out
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger className="cursor-pointer outline-none">
+                <Avatar className="h-9 w-9 border-2 border-white/30 hover:border-white transition">
+                  {userId && <AvatarImage src={imageUrl(`/api/users/${userId}/avatar`)!} />}
+                  <AvatarFallback className="bg-white text-black font-semibold text-sm">
+                    {userId?.toString().charAt(0) ?? "?"}
+                  </AvatarFallback>
+                </Avatar>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuItem className="cursor-pointer" onClick={() => navigate("/home")}>
+                  Browse Listings
+                </DropdownMenuItem>
+                <DropdownMenuItem className="cursor-pointer" onClick={() => navigate("/messages")}>
+                  Messages
+                </DropdownMenuItem>
+                <DropdownMenuItem className="cursor-pointer" onClick={() => navigate("/profile/edit")}>
+                  Edit Profile
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem className="cursor-pointer" onClick={handleSignOut}>
+                  Sign out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </header>

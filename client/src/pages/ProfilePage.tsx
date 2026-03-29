@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { http, imageUrl } from "@/lib/http";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface User {
   id: number;
@@ -45,9 +46,12 @@ export default function ProfilePage() {
       <div className="max-w-4xl mx-auto px-4 py-8">
         {/* Profile Header */}
         <div className="bg-white rounded-xl border border-gray-200 p-6 flex items-center gap-6">
-          <div className="w-20 h-20 bg-indigo-100 rounded-full flex items-center justify-center text-3xl font-bold text-indigo-600">
-            {user.username.charAt(0).toUpperCase()}
-          </div>
+          <Avatar className="h-20 w-20">
+            <AvatarImage src={imageUrl(`/api/users/${id}/avatar`)!} />
+            <AvatarFallback className="bg-indigo-100 text-3xl font-bold text-indigo-600">
+              {user.username.charAt(0).toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
           <div>
             <h1 className="text-2xl font-bold text-gray-900">{user.username}</h1>
             <p className="mt-1 text-sm text-gray-400">Joined {new Date(user.created_at).toLocaleDateString()}</p>

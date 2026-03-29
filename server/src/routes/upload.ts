@@ -52,4 +52,38 @@ router.get("/listings/:id/image", async (req, res) => {
   res.send(image_data);
 });
 
+// Upload avatar for a user
+router.post("/avatar", upload.single("image"), async (req, res) => {
+  if (!req.file) {
+    res.status(400).json({ error: "No file uploaded" });
+    return;
+  }
+  const userId = req.body.user_id;
+  if (!userId) {
+    res.status(400).json({ error: "user_id is required" });
+    return;
+  }
+  await pool.query(
+    "UPDATE users SET avatar_data = ?, avatar_mime = ? WHERE id = ?",
+    [req.file.buffer, req.file.mimetype, userId],
+  );
+  res.status(201).json({ url: `/api/users/${userId}/avatar` });
+});
+
+// Serve avatar from DB
+router.get("/users/:id/avatar", async (req, res) => {
+  const [rows] = await pool.query<RowDataPacket[]>(
+    "SELECT avatar_data, avatar_mime FROM users WHERE id = ?",
+    [req.params["id"]],
+  );
+  if (rows.length === 0 || !rows[0]!.avatar_data) {
+    res.status(404).json({ error: "Avatar not found" });
+    return;
+  }
+  const { avatar_data, avatar_mime } = rows[0]!;
+  res.set("Content-Type", avatar_mime);
+  res.set("Cache-Control", "public, max-age=86400");
+  res.send(avatar_data);
+});
+
 export default router;

@@ -1,15 +1,30 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { http, imageUrl } from "@/lib/http";
-import { signOut } from "@/lib/token";
+import { getToken, signOut } from "@/lib/token";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import logo from "@/assets/campusswap_logo.png";
+
+function getUserFromToken(): { id: number; initial: string } | null {
+  const token = getToken();
+  if (!token) return null;
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]!));
+    const id = Number(payload.sub);
+    return { id, initial: id.toString().charAt(0).toUpperCase() };
+  } catch {
+    return null;
+  }
+}
 
 interface Listing {
   id: number;
+  user_id: number;
   title: string;
   price: number;
   category: string;
@@ -24,9 +39,11 @@ const categories = ["all", "textbooks", "electronics", "furniture", "clothing", 
 
 export default function HomePage() {
   const navigate = useNavigate();
+  const [currentUser] = useState(() => getUserFromToken());
   const [listings, setListings] = useState<Listing[]>([]);
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("all");
+  const avatarSrc = currentUser ? imageUrl(`/api/users/${currentUser.id}/avatar`) : null;
 
   useEffect(() => {
     const params = new URLSearchParams();
@@ -63,23 +80,35 @@ export default function HomePage() {
           <div className="flex items-center gap-3 shrink-0">
             <Button
               className="bg-white text-black cursor-pointer"
-              onClick={() => navigate("/my-listings")}
-            >
-              My Listings
-            </Button>
-            <Button
-              className="bg-white text-black cursor-pointer"
               onClick={() => navigate("/listings/new")}
             >
               Sell Item
             </Button>
-            <Button
-              variant="ghost"
-              className="text-white cursor-pointer hover:text-black"
-              onClick={handleSignOut}
-            >
-              Sign out
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger className="cursor-pointer outline-none">
+                <Avatar className="h-9 w-9 border-2 border-white/30 hover:border-white transition">
+                  {avatarSrc && <AvatarImage src={avatarSrc} />}
+                  <AvatarFallback className="bg-white text-black font-semibold text-sm">
+                    {currentUser?.initial ?? "?"}
+                  </AvatarFallback>
+                </Avatar>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuItem className="cursor-pointer" onClick={() => navigate("/my-listings")}>
+                  My Listings
+                </DropdownMenuItem>
+                <DropdownMenuItem className="cursor-pointer" onClick={() => navigate("/messages")}>
+                  Messages
+                </DropdownMenuItem>
+                <DropdownMenuItem className="cursor-pointer" onClick={() => navigate("/profile/edit")}>
+                  Edit Profile
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem className="cursor-pointer" onClick={handleSignOut}>
+                  Sign out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </header>
@@ -121,7 +150,15 @@ export default function HomePage() {
                     <h3 className="font-semibold truncate">{listing.title}</h3>
                     <p className="text-lg font-bold mt-1">${Number(listing.price).toFixed(2)}</p>
                     <div className="flex items-center justify-between mt-2">
-                      <span className="text-sm text-muted-foreground">{listing.username}</span>
+                      <div className="flex items-center gap-1.5">
+                        <Avatar className="h-5 w-5">
+                          <AvatarImage src={imageUrl(`/api/users/${listing.user_id}/avatar`)!} />
+                          <AvatarFallback className="text-[10px] font-semibold">
+                            {listing.username.charAt(0).toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
+                        <span className="text-sm text-muted-foreground">{listing.username}</span>
+                      </div>
                       <Badge variant="secondary" className="capitalize">
                         {listing.condition_type.replace("_", " ")}
                       </Badge>

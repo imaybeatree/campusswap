@@ -7,7 +7,7 @@ const router = Router();
 // GET /api/users/:id - get user profile
 router.get("/:id", async (req, res) => {
   const [rows] = await pool.query<RowDataPacket[]>(
-    "SELECT id, email, username, created_at FROM users WHERE id = ?",
+    "SELECT id, email, username, created_at, (avatar_data IS NOT NULL) as has_avatar FROM users WHERE id = ?",
     [req.params["id"]]
   );
   if (rows.length === 0) {
