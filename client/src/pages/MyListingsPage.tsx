@@ -1,13 +1,11 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { http, imageUrl } from "@/lib/http";
-import { getToken, signOut } from "@/lib/token";
+import { getToken } from "@/lib/token";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import logo from "@/assets/campusswap_logo.png";
+import Header from "@/components/Header";
 
 interface Listing {
   id: number;
@@ -44,58 +42,19 @@ export default function MyListingsPage() {
       .catch(console.error);
   }, [userId]);
 
-  const handleSignOut = () => {
-    signOut();
-    navigate("/");
-  };
-
   const active = listings.filter((l) => l.status === "active");
   const sold = listings.filter((l) => l.status === "sold");
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b bg-black border-border px-6 py-4">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <Link to="/home" className="flex items-center gap-2">
-            <img src={logo} alt="CampusSwap" className="h-8 w-8" />
-            <span className="text-xl text-white font-bold">CampusSwap</span>
-          </Link>
-          <div className="flex items-center gap-3">
-            <Button
-              className="bg-white text-black cursor-pointer"
-              onClick={() => navigate("/home")}
-            >
-              Browse Listings
-            </Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger className="cursor-pointer outline-none">
-                <Avatar className="h-9 w-9 border-2 border-white/30 hover:border-white transition">
-                  {userId && <AvatarImage src={imageUrl(`/api/users/${userId}/avatar`)!} />}
-                  <AvatarFallback className="bg-white text-black font-semibold text-sm">
-                    {userId?.toString().charAt(0) ?? "?"}
-                  </AvatarFallback>
-                </Avatar>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuItem className="cursor-pointer" onClick={() => navigate("/home")}>
-                  Browse Listings
-                </DropdownMenuItem>
-                <DropdownMenuItem className="cursor-pointer" onClick={() => navigate("/messages")}>
-                  Messages
-                </DropdownMenuItem>
-                <DropdownMenuItem className="cursor-pointer" onClick={() => navigate("/profile/edit")}>
-                  Edit Profile
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem className="cursor-pointer" onClick={handleSignOut}>
-                  Sign out
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        </div>
-      </header>
+      <Header
+        navItems={[
+          { label: "Browse Listings", href: "/home" },
+          { label: "Messages", href: "/messages" },
+          { label: "Edit Profile", href: "/profile/edit" },
+        ]}
+        actionButton={{ label: "Browse Listings", href: "/home" }}
+      />
 
       <div className="max-w-6xl mx-auto px-6 py-10">
         <div className="flex items-center justify-between mb-8">

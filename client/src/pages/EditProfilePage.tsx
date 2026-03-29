@@ -6,7 +6,7 @@ import { getToken, signOut } from "@/lib/token";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import logo from "@/assets/campusswap_logo.png";
+import Header from "@/components/Header";
 
 interface User {
   id: number;
@@ -103,15 +103,13 @@ export default function EditProfilePage() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b bg-black border-border px-6 py-4">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <Link to="/home" className="flex items-center gap-2">
-            <img src={logo} alt="CampusSwap" className="h-8 w-8" />
-            <span className="text-xl text-white font-bold">CampusSwap</span>
-          </Link>
-        </div>
-      </header>
+      <Header
+        navItems={[
+          { label: "Browse Listings", href: "/home" },
+          { label: "My Listings", href: "/my-listings" },
+          { label: "Messages", href: "/messages" },
+        ]}
+      />
 
       <div className="max-w-lg mx-auto px-6 py-10">
         <Link to="/home" className="text-sm font-medium hover:underline">&larr; Back</Link>

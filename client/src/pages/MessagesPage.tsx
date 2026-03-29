@@ -1,11 +1,9 @@
 import { useState, useEffect, useRef } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { http, imageUrl } from "@/lib/http";
-import { getToken, signOut } from "@/lib/token";
+import { getToken } from "@/lib/token";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import logo from "@/assets/campusswap_logo.png";
+import Header from "@/components/Header";
 
 function getCurrentUserId(): number | null {
   const token = getToken();
@@ -42,7 +40,6 @@ interface Message {
 }
 
 export default function MessagesPage() {
-  const navigate = useNavigate();
   const { listingId, otherUserId } = useParams();
   const [currentUserId] = useState(() => getCurrentUserId());
   const [conversations, setConversations] = useState<Conversation[]>([]);
@@ -51,7 +48,7 @@ export default function MessagesPage() {
   const [sending, setSending] = useState(false);
   const [activeConvo, setActiveConvo] = useState<Conversation | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const avatarSrc = currentUserId ? imageUrl(`/api/users/${currentUserId}/avatar`) : null;
+  const updateUnreadRef = useRef<((updater: (prev: number) => number) => void) | null>(null);
 
   // Load conversations
   useEffect(() => {
@@ -79,6 +76,11 @@ export default function MessagesPage() {
       .get<Message[]>(`/api/messages/thread/${activeConvo.listing_id}/${activeConvo.other_user_id}`)
       .then((res) => {
         setMessages(res.data);
+        // Decrement header unread count by this conversation's unread count
+        const readCount = activeConvo.unread_count;
+        if (readCount > 0) {
+          updateUnreadRef.current?.((prev) => Math.max(0, prev - readCount));
+        }
         // Clear unread count locally
         setConversations((prev) =>
           prev.map((c) =>
@@ -126,11 +128,6 @@ export default function MessagesPage() {
     }
   };
 
-  const handleSignOut = () => {
-    signOut();
-    navigate("/");
-  };
-
   const formatTime = (dateStr: string) => {
     const date = new Date(dateStr);
     const now = new Date();
@@ -149,45 +146,15 @@ export default function MessagesPage() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      {/* Header */}
-      <header className="border-b bg-black border-border px-6 py-4 shrink-0">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <Link to="/home" className="flex items-center gap-2">
-            <img src={logo} alt="CampusSwap" className="h-8 w-8" />
-            <span className="text-xl text-white font-bold">CampusSwap</span>
-          </Link>
-          <div className="flex items-center gap-3">
-            <Button className="bg-white text-black cursor-pointer" onClick={() => navigate("/listings/new")}>
-              Sell Item
-            </Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger className="cursor-pointer outline-none">
-                <Avatar className="h-9 w-9 border-2 border-white/30 hover:border-white transition">
-                  {avatarSrc && <AvatarImage src={avatarSrc} />}
-                  <AvatarFallback className="bg-white text-black font-semibold text-sm">
-                    {currentUserId?.toString().charAt(0) ?? "?"}
-                  </AvatarFallback>
-                </Avatar>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuItem className="cursor-pointer" onClick={() => navigate("/home")}>
-                  Browse Listings
-                </DropdownMenuItem>
-                <DropdownMenuItem className="cursor-pointer" onClick={() => navigate("/my-listings")}>
-                  My Listings
-                </DropdownMenuItem>
-                <DropdownMenuItem className="cursor-pointer" onClick={() => navigate("/profile/edit")}>
-                  Edit Profile
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem className="cursor-pointer" onClick={handleSignOut}>
-                  Sign out
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        </div>
-      </header>
+      <Header
+        navItems={[
+          { label: "Browse Listings", href: "/home" },
+          { label: "My Listings", href: "/my-listings" },
+          { label: "Edit Profile", href: "/profile/edit" },
+        ]}
+        actionButton={{ label: "Sell Item", href: "/listings/new" }}
+        onUnreadCount={(setter) => { updateUnreadRef.current = setter; }}
+      />
 
       {/* Main content */}
       <div className="flex-1 max-w-6xl mx-auto w-full flex overflow-hidden" style={{ height: "calc(100vh - 73px)" }}>
@@ -303,7 +270,7 @@ export default function MessagesPage() {
                             : "bg-muted rounded-bl-md"
                         }`}
                       >
-                        <p className="text-sm whitespace-pre-wrap break-words">{msg.content}</p>
+                        <p className="text-sm whitespace-pre-wrap wrap-break-word">{msg.content}</p>
                         <p
                           className={`text-[10px] mt-1 ${
                             isMine ? "text-white/60" : "text-muted-foreground"

@@ -1,26 +1,12 @@
 import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { http, imageUrl } from "@/lib/http";
-import { getToken, signOut } from "@/lib/token";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import logo from "@/assets/campusswap_logo.png";
-
-function getUserFromToken(): { id: number; initial: string } | null {
-  const token = getToken();
-  if (!token) return null;
-  try {
-    const payload = JSON.parse(atob(token.split(".")[1]!));
-    const id = Number(payload.sub);
-    return { id, initial: id.toString().charAt(0).toUpperCase() };
-  } catch {
-    return null;
-  }
-}
+import Header from "@/components/Header";
 
 interface Listing {
   id: number;
@@ -38,12 +24,9 @@ interface Listing {
 const categories = ["all", "textbooks", "electronics", "furniture", "clothing", "supplies", "tickets", "other"];
 
 export default function HomePage() {
-  const navigate = useNavigate();
-  const [currentUser] = useState(() => getUserFromToken());
   const [listings, setListings] = useState<Listing[]>([]);
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("all");
-  const avatarSrc = currentUser ? imageUrl(`/api/users/${currentUser.id}/avatar`) : null;
 
   useEffect(() => {
     const params = new URLSearchParams();
@@ -56,62 +39,24 @@ export default function HomePage() {
       .catch(console.error);
   }, [search, category]);
 
-  const handleSignOut = () => {
-    signOut();
-    navigate("/");
-  };
-
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b bg-black border-border px-6 py-4">
-        <div className="max-w-6xl mx-auto flex items-center justify-between gap-4">
-          <Link to="/home" className="flex items-center gap-2 shrink-0">
-            <img src={logo} alt="CampusSwap" className="h-8 w-8" />
-            <span className="text-xl text-white font-bold">CampusSwap</span>
-          </Link>
-          <Input
-            type="text"
-            placeholder="Search listings..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="flex-1 max-w-md bg-white/10 border-white/20 text-white placeholder:text-white/50 focus:bg-white focus:text-black focus:placeholder:text-muted-foreground"
-          />
-          <div className="flex items-center gap-3 shrink-0">
-            <Button
-              className="bg-white text-black cursor-pointer"
-              onClick={() => navigate("/listings/new")}
-            >
-              Sell Item
-            </Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger className="cursor-pointer outline-none">
-                <Avatar className="h-9 w-9 border-2 border-white/30 hover:border-white transition">
-                  {avatarSrc && <AvatarImage src={avatarSrc} />}
-                  <AvatarFallback className="bg-white text-black font-semibold text-sm">
-                    {currentUser?.initial ?? "?"}
-                  </AvatarFallback>
-                </Avatar>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuItem className="cursor-pointer" onClick={() => navigate("/my-listings")}>
-                  My Listings
-                </DropdownMenuItem>
-                <DropdownMenuItem className="cursor-pointer" onClick={() => navigate("/messages")}>
-                  Messages
-                </DropdownMenuItem>
-                <DropdownMenuItem className="cursor-pointer" onClick={() => navigate("/profile/edit")}>
-                  Edit Profile
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem className="cursor-pointer" onClick={handleSignOut}>
-                  Sign out
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        </div>
-      </header>
+      <Header
+        navItems={[
+          { label: "My Listings", href: "/my-listings" },
+          { label: "Messages", href: "/messages" },
+          { label: "Edit Profile", href: "/profile/edit" },
+        ]}
+        actionButton={{ label: "Sell Item", href: "/listings/new" }}
+      >
+        <Input
+          type="text"
+          placeholder="Search listings..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="flex-1 max-w-md bg-white/10 border-white/20 text-white placeholder:text-white/50 focus:bg-white focus:text-black focus:placeholder:text-muted-foreground"
+        />
+      </Header>
 
       <div className="max-w-6xl mx-auto px-6">
         {/* Categories */}
