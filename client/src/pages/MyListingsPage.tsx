@@ -43,7 +43,19 @@ export default function MyListingsPage() {
   }, [userId]);
 
   const active = listings.filter((l) => l.status === "active");
+  const reserved = listings.filter((l) => l.status === "reserved");
   const sold = listings.filter((l) => l.status === "sold");
+
+  const setStatus = async (listing: Listing, newStatus: string) => {
+    try {
+      await http().put(`/api/listings/${listing.id}`, { ...listing, status: newStatus });
+      setListings((prev) =>
+        prev.map((l) => (l.id === listing.id ? { ...l, status: newStatus } : l))
+      );
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -79,7 +91,19 @@ export default function MyListingsPage() {
                 <h2 className="text-lg font-semibold mb-4">Active ({active.length})</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                   {active.map((listing) => (
-                    <ListingCard key={listing.id} listing={listing} />
+                    <ListingCard key={listing.id} listing={listing} onSetStatus={setStatus} />
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {/* Reserved */}
+            {reserved.length > 0 && (
+              <section className="mb-10">
+                <h2 className="text-lg font-semibold mb-4">Reserved ({reserved.length})</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {reserved.map((listing) => (
+                    <ListingCard key={listing.id} listing={listing} onSetStatus={setStatus} />
                   ))}
                 </div>
               </section>
@@ -91,7 +115,7 @@ export default function MyListingsPage() {
                 <h2 className="text-lg font-semibold mb-4">Sold ({sold.length})</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                   {sold.map((listing) => (
-                    <ListingCard key={listing.id} listing={listing} />
+                    <ListingCard key={listing.id} listing={listing} onSetStatus={setStatus} />
                   ))}
                 </div>
               </section>
@@ -103,10 +127,26 @@ export default function MyListingsPage() {
   );
 }
 
-function ListingCard({ listing }: { listing: Listing }) {
+const statusActions: Record<string, { label: string; status: string; style: string }[]> = {
+  active: [
+    { label: "Mark Reserved", status: "reserved", style: "text-yellow-600 hover:bg-yellow-50 border border-yellow-200" },
+    { label: "Mark Sold", status: "sold", style: "text-red-600 hover:bg-red-50 border border-red-200" },
+  ],
+  reserved: [
+    { label: "Mark Active", status: "active", style: "text-green-600 hover:bg-green-50 border border-green-200" },
+    { label: "Mark Sold", status: "sold", style: "text-red-600 hover:bg-red-50 border border-red-200" },
+  ],
+  sold: [
+    { label: "Relist", status: "active", style: "text-green-600 hover:bg-green-50 border border-green-200" },
+  ],
+};
+
+function ListingCard({ listing, onSetStatus }: { listing: Listing; onSetStatus?: (listing: Listing, status: string) => void }) {
+  const actions = onSetStatus ? (statusActions[listing.status] ?? []) : [];
+
   return (
-    <Link to={`/listings/${listing.id}`}>
-      <Card className="overflow-hidden hover:shadow-md transition border border-border">
+    <Card className="overflow-hidden hover:shadow-md transition border border-border">
+      <Link to={`/listings/${listing.id}`}>
         <div className="aspect-square bg-muted flex items-center justify-center">
           {listing.image_url ? (
             <img src={imageUrl(listing.image_url)!} alt={listing.title} className="w-full h-full object-cover" />
@@ -114,7 +154,7 @@ function ListingCard({ listing }: { listing: Listing }) {
             <span className="text-muted-foreground text-4xl">📦</span>
           )}
         </div>
-        <CardContent className="p-4">
+        <CardContent className="p-4 pb-2">
           <h3 className="font-semibold truncate">{listing.title}</h3>
           <p className="text-lg font-bold mt-1">${Number(listing.price).toFixed(2)}</p>
           <div className="flex items-center justify-between mt-2">
@@ -129,7 +169,20 @@ function ListingCard({ listing }: { listing: Listing }) {
             </span>
           </div>
         </CardContent>
-      </Card>
-    </Link>
+      </Link>
+      {actions.length > 0 && (
+        <div className="px-4 pb-3 flex gap-2">
+          {actions.map((action) => (
+            <button
+              key={action.status}
+              onClick={() => onSetStatus!(listing, action.status)}
+              className={`flex-1 text-xs font-medium py-1.5 rounded-md cursor-pointer transition ${action.style}`}
+            >
+              {action.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </Card>
   );
 }

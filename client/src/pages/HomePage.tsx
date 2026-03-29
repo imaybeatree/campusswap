@@ -84,11 +84,16 @@ export default function HomePage() {
             {listings.map((listing) => (
               <Link key={listing.id} to={`/listings/${listing.id}`}>
                 <Card className="overflow-hidden hover:shadow-md transition border border-border">
-                  <div className="aspect-square bg-muted flex items-center justify-center">
+                  <div className="aspect-square bg-muted flex items-center justify-center relative">
                     {listing.image_url ? (
                       <img src={imageUrl(listing.image_url)!} alt={listing.title} className="w-full h-full object-cover" />
                     ) : (
                       <span className="text-muted-foreground text-4xl">📦</span>
+                    )}
+                    {listing.status === "reserved" && (
+                      <span className="absolute top-2 left-2 bg-yellow-500 text-white text-xs font-semibold px-2 py-0.5 rounded">
+                        Reserved
+                      </span>
                     )}
                   </div>
                   <CardContent className="p-4">

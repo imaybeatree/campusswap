@@ -14,7 +14,7 @@ export const Category = z.enum([
 
 export const Condition = z.enum(["new", "like_new", "good", "fair", "poor"]);
 
-export const ListingStatus = z.enum(["active", "sold", "removed"]);
+export const ListingStatus = z.enum(["active", "reserved", "sold"]);
 
 // ── Users ──
 

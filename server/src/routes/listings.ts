@@ -10,7 +10,7 @@ router.get("/", async (_req, res) => {
     `SELECT l.id, l.user_id, l.title, l.description, l.price, l.category, l.condition_type, l.status, l.image_url, l.created_at, l.updated_at, u.username
      FROM listings l
      JOIN users u ON l.user_id = u.id
-     WHERE l.status = 'active'
+     WHERE l.status != 'sold'
      ORDER BY l.created_at DESC`
   );
   res.json(rows);
@@ -19,7 +19,7 @@ router.get("/", async (_req, res) => {
 // GET /api/listings/search?q=&category=&minPrice=&maxPrice=
 router.get("/search", async (req, res) => {
   const { q, category, minPrice, maxPrice } = req.query;
-  let sql = `SELECT l.id, l.user_id, l.title, l.description, l.price, l.category, l.condition_type, l.status, l.image_url, l.created_at, l.updated_at, u.username FROM listings l JOIN users u ON l.user_id = u.id WHERE l.status = 'active'`;
+  let sql = `SELECT l.id, l.user_id, l.title, l.description, l.price, l.category, l.condition_type, l.status, l.image_url, l.created_at, l.updated_at, u.username FROM listings l JOIN users u ON l.user_id = u.id WHERE l.status != 'sold'`;
   const params: (string | number)[] = [];
 
   if (q) {

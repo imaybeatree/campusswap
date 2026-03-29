@@ -76,7 +76,7 @@ export default function ProfilePage() {
                 <div className="p-4">
                   <h3 className="font-semibold text-gray-900 truncate">{listing.title}</h3>
                   <p className="text-lg font-bold text-indigo-600 mt-1">${Number(listing.price).toFixed(2)}</p>
-                  <span className={`inline-block mt-2 px-2 py-1 text-xs rounded-full ${listing.status === "active" ? "bg-green-100 text-green-700" : listing.status === "sold" ? "bg-red-100 text-red-700" : "bg-gray-100 text-gray-700"}`}>
+                  <span className={`inline-block mt-2 px-2 py-1 text-xs rounded-full capitalize ${listing.status === "active" ? "bg-green-100 text-green-700" : listing.status === "reserved" ? "bg-yellow-100 text-yellow-700" : "bg-gray-100 text-gray-700"}`}>
                     {listing.status.charAt(0).toUpperCase() + listing.status.slice(1)}
                   </span>
                 </div>

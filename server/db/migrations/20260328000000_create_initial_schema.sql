@@ -16,7 +16,7 @@ CREATE TABLE listings (
   price DECIMAL(10, 2) NOT NULL,
   category ENUM('textbooks', 'electronics', 'furniture', 'clothing', 'supplies', 'tickets', 'other') NOT NULL DEFAULT 'other',
   condition_type ENUM('new', 'like_new', 'good', 'fair', 'poor') NOT NULL DEFAULT 'good',
-  status ENUM('active', 'sold', 'removed') NOT NULL DEFAULT 'active',
+  status ENUM('active', 'reserved', 'sold') NOT NULL DEFAULT 'active',
   image_url VARCHAR(500),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
