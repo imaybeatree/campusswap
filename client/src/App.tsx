@@ -10,6 +10,7 @@ import ProfilePage from "./pages/ProfilePage";
 import MyListingsPage from "./pages/MyListingsPage";
 import EditProfilePage from "./pages/EditProfilePage";
 import MessagesPage from "./pages/MessagesPage";
+import EditListingPage from "./pages/EditListingPage";
 
 export default function App() {
   return (
@@ -25,6 +26,7 @@ export default function App() {
           <Route path="/home" element={<HomePage />} />
           <Route path="/listings/new" element={<CreateListingPage />} />
           <Route path="/listings/:id" element={<ListingDetailPage />} />
+          <Route path="/listings/:id/edit" element={<EditListingPage />} />
           <Route path="/my-listings" element={<MyListingsPage />} />
           <Route path="/profile/edit" element={<EditProfilePage />} />
           <Route path="/profile/:id" element={<ProfilePage />} />

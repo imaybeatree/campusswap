@@ -6,6 +6,17 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Header from "@/components/Header";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface Listing {
   id: number;
@@ -57,6 +68,15 @@ export default function MyListingsPage() {
     }
   };
 
+  const deleteListing = async (listing: Listing) => {
+    try {
+      await http().delete(`/api/listings/${listing.id}`);
+      setListings((prev) => prev.filter((l) => l.id !== listing.id));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Header
@@ -91,7 +111,7 @@ export default function MyListingsPage() {
                 <h2 className="text-lg font-semibold mb-4">Active ({active.length})</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                   {active.map((listing) => (
-                    <ListingCard key={listing.id} listing={listing} onSetStatus={setStatus} />
+                    <ListingCard key={listing.id} listing={listing} onSetStatus={setStatus} onDelete={deleteListing} />
                   ))}
                 </div>
               </section>
@@ -103,7 +123,7 @@ export default function MyListingsPage() {
                 <h2 className="text-lg font-semibold mb-4">Reserved ({reserved.length})</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                   {reserved.map((listing) => (
-                    <ListingCard key={listing.id} listing={listing} onSetStatus={setStatus} />
+                    <ListingCard key={listing.id} listing={listing} onSetStatus={setStatus} onDelete={deleteListing} />
                   ))}
                 </div>
               </section>
@@ -115,7 +135,7 @@ export default function MyListingsPage() {
                 <h2 className="text-lg font-semibold mb-4">Sold ({sold.length})</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                   {sold.map((listing) => (
-                    <ListingCard key={listing.id} listing={listing} onSetStatus={setStatus} />
+                    <ListingCard key={listing.id} listing={listing} onSetStatus={setStatus} onDelete={deleteListing} />
                   ))}
                 </div>
               </section>
@@ -141,7 +161,14 @@ const statusActions: Record<string, { label: string; status: string; style: stri
   ],
 };
 
-function ListingCard({ listing, onSetStatus }: { listing: Listing; onSetStatus?: (listing: Listing, status: string) => void }) {
+interface ListingCardProps {
+  listing: Listing;
+  onSetStatus?: (listing: Listing, status: string) => void;
+  onDelete?: (listing: Listing) => void;
+}
+
+function ListingCard({ listing, onSetStatus, onDelete }: ListingCardProps) {
+  const navigate = useNavigate();
   const actions = onSetStatus ? (statusActions[listing.status] ?? []) : [];
 
   return (
@@ -170,19 +197,53 @@ function ListingCard({ listing, onSetStatus }: { listing: Listing; onSetStatus?:
           </div>
         </CardContent>
       </Link>
-      {actions.length > 0 && (
-        <div className="px-4 pb-3 flex gap-2">
-          {actions.map((action) => (
-            <button
-              key={action.status}
-              onClick={() => onSetStatus!(listing, action.status)}
-              className={`flex-1 text-xs font-medium py-1.5 rounded-md cursor-pointer transition ${action.style}`}
-            >
-              {action.label}
-            </button>
-          ))}
+      <div className="px-4 pb-3 flex flex-col gap-2">
+        {actions.length > 0 && (
+          <div className="flex gap-2">
+            {actions.map((action) => (
+              <button
+                key={action.status}
+                onClick={() => onSetStatus!(listing, action.status)}
+                className={`flex-1 text-xs font-medium py-1.5 rounded-md cursor-pointer transition ${action.style}`}
+              >
+                {action.label}
+              </button>
+            ))}
+          </div>
+        )}
+        <div className="flex gap-2">
+          <button
+            onClick={() => navigate(`/listings/${listing.id}/edit`)}
+            className="flex-1 text-xs font-medium py-1.5 rounded-md cursor-pointer transition text-blue-600 hover:bg-blue-50 border border-blue-200"
+          >
+            Edit
+          </button>
+          {onDelete && (
+            <AlertDialog>
+              <AlertDialogTrigger className="flex-1 text-xs font-medium py-1.5 rounded-md cursor-pointer transition text-red-600 hover:bg-red-50 border border-red-200">
+                Delete
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Delete listing?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This will permanently delete "{listing.title}". This action cannot be undone.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    className="bg-red-600 hover:bg-red-700"
+                    onClick={() => onDelete(listing)}
+                  >
+                    Delete
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
         </div>
-      )}
+      </div>
     </Card>
   );
 }
