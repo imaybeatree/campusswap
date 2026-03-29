@@ -67,7 +67,7 @@ export default function Header({ navItems = [], actionButton, children, onUnread
       <div className="max-w-6xl mx-auto flex items-center justify-between gap-4">
         <Link to="/home" className="flex items-center gap-2 shrink-0">
           <img src={logo} alt="CampusSwap" className="h-8 w-8" />
-          <span className="text-xl text-white font-bold">CampusSwap</span>
+          <span className="text-xl text-white font-bold hidden sm:inline">CampusSwap</span>
         </Link>
 
         {children}
