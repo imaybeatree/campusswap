@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { http } from "@/lib/http";
+import { getToken } from "@/lib/token";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -49,7 +50,7 @@ export default function CreateListingPage() {
       const res = await http().post<{ id: number }>("/api/listings", {
         ...form,
         price: parseFloat(form.price),
-        user_id: 1, // TODO: replace with auth
+        user_id: Number(JSON.parse(atob(getToken()!.split(".")[1]!)).sub),
         image_url: null,
       });
 

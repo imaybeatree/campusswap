@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import UserAvatar from "@/components/UserAvatar";
 import Header from "@/components/Header";
 
 interface Listing {
@@ -101,12 +101,12 @@ export default function HomePage() {
                     <p className="text-lg font-bold mt-1">${Number(listing.price).toFixed(2)}</p>
                     <div className="flex items-center justify-between mt-2">
                       <div className="flex items-center gap-1.5">
-                        <Avatar className="h-5 w-5">
-                          <AvatarImage src={imageUrl(`/api/users/${listing.user_id}/avatar`)!} />
-                          <AvatarFallback className="text-[10px] font-semibold">
-                            {listing.username.charAt(0).toUpperCase()}
-                          </AvatarFallback>
-                        </Avatar>
+                        <UserAvatar
+                          userId={listing.user_id}
+                          name={listing.username}
+                          className="h-5 w-5"
+                          fallbackClassName="text-[10px] font-semibold"
+                        />
                         <span className="text-sm text-muted-foreground">{listing.username}</span>
                       </div>
                       <Badge variant="secondary" className="capitalize">

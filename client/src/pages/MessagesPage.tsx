@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Link, useParams } from "react-router-dom";
 import { http, imageUrl } from "@/lib/http";
 import { getToken } from "@/lib/token";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import UserAvatar from "@/components/UserAvatar";
 import Header from "@/components/Header";
 
 function getCurrentUserId(): number | null {
@@ -182,12 +182,12 @@ export default function MessagesPage() {
                     }`}
                   >
                     <div className="flex items-start gap-3">
-                      <Avatar className="h-10 w-10 shrink-0">
-                        <AvatarImage src={imageUrl(`/api/users/${convo.other_user_id}/avatar`)!} />
-                        <AvatarFallback className="font-semibold text-sm">
-                          {convo.other_username.charAt(0).toUpperCase()}
-                        </AvatarFallback>
-                      </Avatar>
+                      <UserAvatar
+                        userId={convo.other_user_id}
+                        name={convo.other_username}
+                        className="h-10 w-10 shrink-0"
+                        fallbackClassName="font-semibold text-sm"
+                      />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between">
                           <span className="font-semibold text-sm truncate">{convo.other_username}</span>
@@ -231,12 +231,12 @@ export default function MessagesPage() {
             <>
               {/* Thread header */}
               <div className="p-4 border-b border-border flex items-center gap-3">
-                <Avatar className="h-9 w-9">
-                  <AvatarImage src={imageUrl(`/api/users/${activeConvo.other_user_id}/avatar`)!} />
-                  <AvatarFallback className="font-semibold text-sm">
-                    {activeConvo.other_username.charAt(0).toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
+                <UserAvatar
+                  userId={activeConvo.other_user_id}
+                  name={activeConvo.other_username}
+                  className="h-9 w-9"
+                  fallbackClassName="font-semibold text-sm"
+                />
                 <div className="min-w-0">
                   <p className="font-semibold text-sm">{activeConvo.other_username}</p>
                   <Link

@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { http, imageUrl } from "@/lib/http";
+import { http } from "@/lib/http";
 import { getToken, signOut } from "@/lib/token";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import UserAvatar from "@/components/UserAvatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,13 +13,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 import logo from "@/assets/campusswap_logo.png";
 
-function getUserFromToken(): { id: number; initial: string } | null {
+function getUserIdFromToken(): number | null {
   const token = getToken();
   if (!token) return null;
   try {
     const payload = JSON.parse(atob(token.split(".")[1]!));
-    const id = Number(payload.sub);
-    return { id, initial: id.toString().charAt(0).toUpperCase() };
+    return Number(payload.sub);
   } catch {
     return null;
   }
@@ -39,16 +38,20 @@ interface HeaderProps {
 
 export default function Header({ navItems = [], actionButton, children, onUnreadCount }: HeaderProps) {
   const navigate = useNavigate();
-  const [currentUser] = useState(() => getUserFromToken());
+  const [userId] = useState(() => getUserIdFromToken());
+  const [username, setUsername] = useState("");
   const [unreadCount, setUnreadCount] = useState(0);
-  const avatarSrc = currentUser ? imageUrl(`/api/users/${currentUser.id}/avatar`) : null;
 
   useEffect(() => {
+    if (!userId) return;
+    http().get<{ username: string }>(`/api/users/${userId}`)
+      .then((res) => setUsername(res.data.username))
+      .catch(() => {});
     http()
       .get<{ count: number }>("/api/messages/unread-count")
       .then((res) => setUnreadCount(res.data.count))
       .catch(() => {});
-  }, []);
+  }, [userId]);
 
   useEffect(() => {
     onUnreadCount?.(setUnreadCount);
@@ -83,12 +86,12 @@ export default function Header({ navItems = [], actionButton, children, onUnread
             <DropdownMenu>
               <DropdownMenuTrigger className="cursor-pointer outline-none">
                 <div className="relative">
-                  <Avatar className="h-9 w-9 border-2 border-white/30 hover:border-white transition">
-                    {avatarSrc && <AvatarImage src={avatarSrc} />}
-                    <AvatarFallback className="bg-white text-black font-semibold text-sm">
-                      {currentUser?.initial ?? "?"}
-                    </AvatarFallback>
-                  </Avatar>
+                  <UserAvatar
+                    userId={userId!}
+                    name={username}
+                    className="h-9 w-9 border-2 border-white/30 hover:border-white transition"
+                    fallbackClassName="bg-white text-black font-semibold text-sm"
+                  />
                   {unreadCount > 0 && (
                     <span className="absolute -bottom-0.5 -right-0.5 bg-red-500 text-white text-[10px] font-bold rounded-full h-4 min-w-4 flex items-center justify-center px-1 ring-2 ring-black">
                       {unreadCount > 99 ? "99+" : unreadCount}

@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { http, imageUrl } from "@/lib/http";
 import { getToken } from "@/lib/token";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import UserAvatar from "@/components/UserAvatar";
 
 interface ListingDetail {
   id: number;
@@ -93,12 +93,12 @@ export default function ListingDetailPage() {
             <p className="text-3xl font-bold text-black mt-2">${Number(listing.price).toFixed(2)}</p>
 
             <Link to={`/profile/${listing.user_id}`} className="mt-6 flex items-center gap-3 p-4 bg-white rounded-lg border border-gray-200 hover:border-gray-300 transition">
-              <Avatar className="h-10 w-10">
-                <AvatarImage src={imageUrl(`/api/users/${listing.user_id}/avatar`)!} />
-                <AvatarFallback className="bg-indigo-100 text-indigo-600 font-bold">
-                  {listing.username.charAt(0).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
+              <UserAvatar
+                userId={listing.user_id}
+                name={listing.username}
+                className="h-10 w-10"
+                fallbackClassName="bg-indigo-100 text-indigo-600 font-bold"
+              />
               <div>
                 <p className="font-semibold text-gray-900">{listing.username}</p>
               </div>
