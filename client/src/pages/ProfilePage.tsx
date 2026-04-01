@@ -65,8 +65,8 @@ export default function ProfilePage() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             {listings.map((listing) => (
-              <Link key={listing.id} to={`/listings/${listing.id}`} className="bg-white rounded-xl shadow-sm hover:shadow-md transition overflow-hidden border border-gray-100">
-                <div className="aspect-square bg-gray-200 flex items-center justify-center">
+              <Link key={listing.id} to={`/listings/${listing.id}`} className="bg-white rounded-xl shadow-sm hover:shadow-md transition overflow-hidden border border-gray-100 w-64">
+                <div className="w-64 h-64 bg-gray-200 flex items-center justify-center">
                   {listing.image_url ? (
                     <img src={imageUrl(listing.image_url)!} alt={listing.title} className="w-full h-full object-cover" />
                   ) : (

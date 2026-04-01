@@ -83,8 +83,8 @@ export default function HomePage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 pb-12 place-items-center">
             {listings.map((listing) => (
               <Link key={listing.id} to={`/listings/${listing.id}`}>
-                <Card className="overflow-hidden hover:shadow-md transition border border-border">
-                  <div className="aspect-square bg-muted flex items-center justify-center relative">
+                <Card className="overflow-hidden hover:shadow-md transition border border-border w-64">
+                  <div className="w-64 h-64 bg-muted flex items-center justify-center relative">
                     {listing.image_url ? (
                       <img src={imageUrl(listing.image_url)!} alt={listing.title} className="w-full h-full object-cover" />
                     ) : (

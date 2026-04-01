@@ -172,9 +172,9 @@ function ListingCard({ listing, onSetStatus, onDelete }: ListingCardProps) {
   const actions = onSetStatus ? (statusActions[listing.status] ?? []) : [];
 
   return (
-    <Card className="overflow-hidden hover:shadow-md transition border border-border">
+    <Card className="overflow-hidden hover:shadow-md transition border border-border w-64">
       <Link to={`/listings/${listing.id}`}>
-        <div className="aspect-square bg-muted flex items-center justify-center">
+        <div className="w-64 h-64 bg-muted flex items-center justify-center">
           {listing.image_url ? (
             <img src={imageUrl(listing.image_url)!} alt={listing.title} className="w-full h-full object-cover" />
           ) : (
