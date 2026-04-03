@@ -21,7 +21,7 @@ interface Listing {
   created_at: string;
 }
 
-const categories = ["all", "textbooks", "electronics", "furniture", "clothing", "supplies", "tickets", "other"];
+const categories = ["all", "textbooks", "electronics", "furniture", "clothing", "supplies", "tickets", "looking_for", "other"];
 
 export default function HomePage() {
   const [listings, setListings] = useState<Listing[]>([]);
@@ -47,7 +47,7 @@ export default function HomePage() {
           { label: "Messages", href: "/messages" },
           { label: "Edit Profile", href: "/profile/edit" },
         ]}
-        actionButton={{ label: "Sell Item", href: "/listings/new" }}
+        actionButton={{ label: "Create Listing", href: "/listings/new" }}
       >
         <Input
           type="text"
@@ -69,7 +69,7 @@ export default function HomePage() {
               className="rounded-full whitespace-nowrap cursor-pointer"
               onClick={() => setCategory(c)}
             >
-              {c.charAt(0).toUpperCase() + c.slice(1)}
+              {c === "looking_for" ? "Looking For" : c.charAt(0).toUpperCase() + c.slice(1)}
             </Button>
           ))}
         </div>
@@ -93,6 +93,11 @@ export default function HomePage() {
                     {listing.status === "reserved" && (
                       <span className="absolute top-2 left-2 bg-yellow-500 text-white text-xs font-semibold px-2 py-0.5 rounded">
                         Reserved
+                      </span>
+                    )}
+                    {listing.category === "looking_for" && (
+                      <span className="absolute top-2 left-2 bg-blue-500 text-white text-xs font-semibold px-2 py-0.5 rounded">
+                        Looking For
                       </span>
                     )}
                   </div>

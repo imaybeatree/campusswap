@@ -9,8 +9,11 @@ import { Card } from "@/components/ui/card";
 const categories = ["textbooks", "electronics", "furniture", "clothing", "supplies", "tickets", "other"] as const;
 const conditions = ["new", "like_new", "good", "fair", "poor"] as const;
 
+type ListingMode = "selling" | "looking_for";
+
 export default function CreateListingPage() {
   const navigate = useNavigate();
+  const [mode, setMode] = useState<ListingMode>("selling");
   const [form, setForm] = useState({
     title: "",
     description: "",
@@ -18,6 +21,8 @@ export default function CreateListingPage() {
     category: "other" as string,
     condition_type: "good" as string,
   });
+
+  const isLookingFor = mode === "looking_for";
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [error, setError] = useState("");
@@ -79,7 +84,27 @@ export default function CreateListingPage() {
       </nav>
 
       <div className="max-w-2xl mx-auto px-6 py-8">
-        <h1 className="text-2xl font-bold mb-6">Sell an Item</h1>
+        <h1 className="text-2xl font-bold mb-6">Create a Listing</h1>
+
+        {/* Listing Mode Toggle */}
+        <div className="flex gap-2 mb-6">
+          <Button
+            type="button"
+            variant={mode === "selling" ? "default" : "outline"}
+            className="flex-1 cursor-pointer"
+            onClick={() => { setMode("selling"); update("category", "other"); }}
+          >
+            Selling an Item
+          </Button>
+          <Button
+            type="button"
+            variant={mode === "looking_for" ? "default" : "outline"}
+            className="flex-1 cursor-pointer"
+            onClick={() => { setMode("looking_for"); update("category", "looking_for"); }}
+          >
+            Looking for an Item
+          </Button>
+        </div>
 
         {error && <div className="mb-4 p-3 bg-red-50 text-red-700 rounded-lg text-sm">{error}</div>}
 
@@ -147,7 +172,9 @@ export default function CreateListingPage() {
           {/* Price + Category */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium mb-1">Price ($) *</label>
+              <label className="block text-sm font-medium mb-1">
+                {isLookingFor ? "Expected Price ($) *" : "Price ($) *"}
+              </label>
               <Input
                 type="number"
                 step="0.01"
@@ -159,21 +186,27 @@ export default function CreateListingPage() {
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">Category</label>
-              <select
-                value={form.category}
-                onChange={(e) => update("category", e.target.value)}
-                className="w-full h-8 px-3 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-ring text-sm"
-              >
-                {categories.map((c) => (
-                  <option key={c} value={c}>{c.charAt(0).toUpperCase() + c.slice(1)}</option>
-                ))}
-              </select>
+              {isLookingFor ? (
+                <Input value="Looking For" disabled className="bg-muted" />
+              ) : (
+                <select
+                  value={form.category}
+                  onChange={(e) => update("category", e.target.value)}
+                  className="w-full h-8 px-3 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-ring text-sm"
+                >
+                  {categories.map((c) => (
+                    <option key={c} value={c}>{c.charAt(0).toUpperCase() + c.slice(1)}</option>
+                  ))}
+                </select>
+              )}
             </div>
           </div>
 
           {/* Condition */}
           <div>
-            <label className="block text-sm font-medium mb-2">Condition</label>
+            <label className="block text-sm font-medium mb-2">
+              {isLookingFor ? "Expected Condition" : "Condition"}
+            </label>
             <div className="flex gap-2 flex-wrap">
               {conditions.map((c) => (
                 <Button

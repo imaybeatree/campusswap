@@ -86,7 +86,7 @@ export default function ListingDetailPage() {
           {/* Details */}
           <div>
             <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
-              <span className="px-2 py-1 bg-indigo-100 text-black rounded-full capitalize">{listing.category}</span>
+              <span className="px-2 py-1 bg-indigo-100 text-black rounded-full capitalize">{listing.category === "looking_for" ? "Looking For" : listing.category}</span>
               <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded-full capitalize">{listing.condition_type.replace("_", " ")}</span>
             </div>
             <h1 className="text-3xl font-bold text-gray-900">{listing.title}</h1>
@@ -116,7 +116,7 @@ export default function ListingDetailPage() {
             {/* Contact Seller */}
             {currentUserId && currentUserId !== listing.user_id && (
               <div className="mt-8 p-4 bg-white rounded-lg border border-gray-200">
-                <h3 className="font-semibold text-gray-900 mb-3">Message Seller</h3>
+                <h3 className="font-semibold text-gray-900 mb-3">Message user</h3>
                 {sent ? (
                   <div className="text-center py-4">
                     <p className="text-green-600 font-medium mb-2">Message sent!</p>

@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS listings (
   title VARCHAR(255) NOT NULL,
   description TEXT,
   price DECIMAL(10, 2) NOT NULL,
-  category ENUM('textbooks', 'electronics', 'furniture', 'clothing', 'supplies', 'tickets', 'other') NOT NULL DEFAULT 'other',
+  category ENUM('textbooks', 'electronics', 'furniture', 'clothing', 'supplies', 'tickets', 'looking_for', 'other') NOT NULL DEFAULT 'other',
   condition_type ENUM('new', 'like_new', 'good', 'fair', 'poor') NOT NULL DEFAULT 'good',
   status ENUM('active', 'reserved', 'sold') NOT NULL DEFAULT 'active',
   image_url VARCHAR(500),

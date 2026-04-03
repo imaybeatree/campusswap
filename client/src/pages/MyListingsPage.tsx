@@ -53,9 +53,10 @@ export default function MyListingsPage() {
       .catch(console.error);
   }, [userId]);
 
-  const active = listings.filter((l) => l.status === "active");
-  const reserved = listings.filter((l) => l.status === "reserved");
-  const sold = listings.filter((l) => l.status === "sold");
+  const lookingFor = listings.filter((l) => l.category === "looking_for");
+  const active = listings.filter((l) => l.status === "active" && l.category !== "looking_for");
+  const reserved = listings.filter((l) => l.status === "reserved" && l.category !== "looking_for");
+  const sold = listings.filter((l) => l.status === "sold" && l.category !== "looking_for");
 
   const setStatus = async (listing: Listing, newStatus: string) => {
     try {
@@ -105,6 +106,18 @@ export default function MyListingsPage() {
           </div>
         ) : (
           <>
+            {/* Looking For */}
+            {lookingFor.length > 0 && (
+              <section className="mb-10">
+                <h2 className="text-lg font-semibold mb-4">Looking For ({lookingFor.length})</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {lookingFor.map((listing) => (
+                    <ListingCard key={listing.id} listing={listing} onSetStatus={setStatus} onDelete={deleteListing} />
+                  ))}
+                </div>
+              </section>
+            )}
+
             {/* Active */}
             {active.length > 0 && (
               <section className="mb-10">
@@ -174,11 +187,16 @@ function ListingCard({ listing, onSetStatus, onDelete }: ListingCardProps) {
   return (
     <Card className="overflow-hidden hover:shadow-md transition border border-border w-64">
       <Link to={`/listings/${listing.id}`}>
-        <div className="w-64 h-64 bg-muted flex items-center justify-center">
+        <div className="w-64 h-64 bg-muted flex items-center justify-center relative">
           {listing.image_url ? (
             <img src={imageUrl(listing.image_url)!} alt={listing.title} className="w-full h-full object-cover" />
           ) : (
             <span className="text-muted-foreground text-4xl">📦</span>
+          )}
+          {listing.category === "looking_for" && (
+            <span className="absolute top-2 left-2 bg-blue-500 text-white text-xs font-semibold px-2 py-0.5 rounded">
+              Looking For
+            </span>
           )}
         </div>
         <CardContent className="p-4 pb-2">
