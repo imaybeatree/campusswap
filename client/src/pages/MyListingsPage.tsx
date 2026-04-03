@@ -182,7 +182,8 @@ interface ListingCardProps {
 
 function ListingCard({ listing, onSetStatus, onDelete }: ListingCardProps) {
   const navigate = useNavigate();
-  const actions = onSetStatus ? (statusActions[listing.status] ?? []) : [];
+  const isLookingFor = listing.category === "looking_for";
+  const actions = onSetStatus && !isLookingFor ? (statusActions[listing.status] ?? []) : [];
 
   return (
     <Card className="overflow-hidden hover:shadow-md transition border border-border w-64">
